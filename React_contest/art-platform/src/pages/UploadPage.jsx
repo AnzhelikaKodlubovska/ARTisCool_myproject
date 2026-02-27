@@ -1,147 +1,182 @@
 import { Upload, ImageIcon, User, Mail, MapPin, Hash } from "lucide-react";
+import React, { useState } from "react";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 export default function UploadPage() {
-  return (
-    <div className="min-h-screen bg-[#0a0f1a] text-white py-20 px-6 relative overflow-hidden">
-      {/* Фонові ефекти */}
-      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] bg-cyan-500/10 rounded-full blur-[120px] -z-10"></div>
+  const navigate = useNavigate();
+  const [error, setError] = useState("");
 
-      <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-12">
-          <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter mb-4">
-            ЗАВАНТАЖИТИ <span className="text-cyan-500">ШЕДЕВР</span>
-          </h1>
-          <p className="text-slate-400 uppercase tracking-widest text-sm">
-            Твій квиток у світ великого мистецтва
-          </p>
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    age: "",
+    city: "",
+    email: "", // Додано в стан
+    title: "",
+    category: "Класика",
+  });
+  const [image, setImage] = useState(null);
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  const handleFileChange = (e) => {
+    setImage(e.target.files[0]);
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const token = localStorage.getItem("token");
+
+    if (!image) {
+      setError("Будь ласка, оберіть малюнок");
+      return;
+    }
+
+    const data = new FormData();
+    data.append("image", image);
+    data.append("title", formData.title);
+    data.append("email", formData.email);
+    data.append("first_name", formData.firstName);
+    data.append("last_name", formData.lastName);
+    data.append("age", formData.age);
+    data.append("city", formData.city);
+
+    try {
+      await axios.post("http://127.0.0.1:8000/api/entries/", data, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+          Authorization: `Token ${token}`,
+        },
+      });
+      alert("Роботу успішно опубліковано!");
+      navigate("/profile");
+    } catch (err) {
+      console.error(err);
+      setError("Помилка завантаження. Перевірте поля або авторизацію.");
+    }
+  };
+
+  return (
+    <div className="min-h-screen bg-[#0a0f1a] py-12 px-4">
+      <div className="max-w-4xl mx-auto bg-slate-900/50 backdrop-blur-xl p-8 rounded-[3rem] border border-white/10 shadow-2xl">
+        <div className="flex items-center gap-4 mb-10 ml-4">
+          <div className="bg-cyan-500/20 p-3 rounded-2xl">
+            <Upload className="text-cyan-500" size={32} />
+          </div>
+          <div>
+            <h1 className="text-3xl font-black text-white tracking-tight italic">
+              UPLOAD ART
+            </h1>
+            <p className="text-slate-400 text-sm uppercase tracking-widest font-bold">
+              Анкета учасника
+            </p>
+          </div>
         </div>
 
-        <form className="bg-white/5 border border-white/10 p-8 md:p-12 rounded-[40px] backdrop-blur-xl shadow-2xl space-y-8">
-          {/* Зона завантаження файлу */}
-          <div className="relative group">
-            <input
-              type="file"
-              className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-20"
-              accept="image/*"
-            />
-            <div className="border-2 border-dashed border-white/10 rounded-3xl p-12 flex flex-col items-center justify-center bg-white/[0.02] group-hover:bg-cyan-500/5 group-hover:border-cyan-500/50 transition-all duration-300">
-              <div className="bg-cyan-500/10 p-5 rounded-2xl mb-4 group-hover:scale-110 transition-transform duration-500">
-                <Upload className="h-10 w-10 text-cyan-500" />
-              </div>
-              <p className="text-lg font-bold text-white group-hover:text-cyan-400">
-                Натисніть або перетягніть файл
-              </p>
-              <p className="text-sm text-slate-500 mt-2 tracking-widest uppercase">
-                PNG, JPG, WEBP • MAX 10MB
-              </p>
-            </div>
-          </div>
+        {error && (
+          <p className="bg-red-500/10 border border-red-500/50 text-red-500 p-4 rounded-2xl mb-6 text-center font-bold">
+            {error}
+          </p>
+        )}
 
+        <form onSubmit={handleSubmit} className="space-y-8">
+          {/* Контактні дані */}
           <div className="grid md:grid-cols-2 gap-6">
-            {/* Ім'я */}
             <div>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
                 <User size={14} className="text-cyan-500" /> Ім'я
               </label>
               <input
+                name="firstName"
                 type="text"
-                placeholder="Введіть ім'я"
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
+                required
+                value={formData.firstName}
+                onChange={handleChange}
+                placeholder="Олександр"
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none text-white"
               />
             </div>
-
-            {/* Прізвище */}
             <div>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
-                <User size={14} className="text-cyan-500" /> Прізвище
+                <Mail size={14} className="text-cyan-500" /> Email
               </label>
               <input
-                type="text"
-                placeholder="Введіть прізвище"
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
+                name="email"
+                type="email"
+                required
+                value={formData.email}
+                onChange={handleChange}
+                placeholder="art@example.com"
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none text-white"
               />
             </div>
           </div>
 
+          {/* Додаткова інформація */}
           <div className="grid md:grid-cols-3 gap-6">
-            {/* Вік */}
             <div>
               <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
                 <Hash size={14} className="text-cyan-500" /> Вік
               </label>
               <input
+                name="age"
                 type="number"
-                placeholder="16"
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
+                value={formData.age}
+                onChange={handleChange}
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none text-white"
               />
             </div>
-
-            {/* Місто */}
             <div className="md:col-span-2">
               <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
                 <MapPin size={14} className="text-cyan-500" /> Місто
               </label>
               <input
+                name="city"
                 type="text"
-                placeholder="Наприклад: Київ"
-                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
+                value={formData.city}
+                onChange={handleChange}
+                placeholder="Київ"
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none text-white"
               />
             </div>
           </div>
 
-          {/* Email */}
-          <div>
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
-              <Mail size={14} className="text-cyan-500" /> Електронна пошта
-            </label>
-            <input
-              type="email"
-              placeholder="yourmail@example.com"
-              className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
-            />
-          </div>
-
-          {/* Назва малюнка */}
-          <div>
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
-              <ImageIcon size={14} className="text-cyan-500" /> Назва роботи
-            </label>
-            <input
-              type="text"
-              placeholder="Наприклад: Зимовий ранок у селі"
-              className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none transition-all text-white placeholder:text-slate-600"
-            />
-          </div>
-
-          {/* Категорія мистецтва */}
-          <div>
-            <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
-              Категорія мистецтва
-            </label>
-            <div className="relative">
-              <select className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none appearance-none transition-all text-white cursor-pointer">
-                <option className="bg-[#0a0f1a]">
-                  Класика (акварель, олія, олівець)
-                </option>
-                <option className="bg-[#0a0f1a]">
-                  Цифровий арт (2D, 3D ілюстрація)
-                </option>
-                <option className="bg-[#0a0f1a]">
-                  Фотографія (фотоманіпуляції)
-                </option>
-              </select>
-              <div className="absolute right-6 top-1/2 -translate-y-1/2 pointer-events-none text-slate-500">
-                ▼
-              </div>
+          {/* Робота */}
+          <div className="grid md:grid-cols-2 gap-6 pt-6 border-t border-white/5">
+            <div>
+              <label className="flex items-center gap-2 text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
+                <ImageIcon size={14} className="text-cyan-500" /> Назва роботи
+              </label>
+              <input
+                name="title"
+                type="text"
+                required
+                value={formData.title}
+                onChange={handleChange}
+                className="w-full bg-white/5 border border-white/10 px-6 py-4 rounded-2xl focus:ring-2 focus:ring-cyan-500 outline-none text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 ml-2">
+                Файл малюнка
+              </label>
+              <input
+                type="file"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="w-full text-slate-400 text-sm file:mr-4 file:py-3 file:px-6 file:rounded-xl file:border-0 file:bg-cyan-500 file:text-[#0a0f1a] file:font-black hover:file:bg-cyan-400 cursor-pointer"
+              />
             </div>
           </div>
 
-          {/* Кнопка */}
           <button
             type="submit"
-            className="w-full bg-cyan-500 text-[#0a0f1a] py-5 rounded-2xl font-black text-xl hover:bg-cyan-400 hover:shadow-[0_0_30px_rgba(6,182,212,0.4)] transition-all active:scale-[0.98] uppercase tracking-widest mt-10"
+            className="w-full bg-cyan-500 text-[#0a0f1a] py-6 rounded-3xl font-black text-xl hover:bg-cyan-400 hover:shadow-[0_0_40px_rgba(6,182,212,0.4)] transition-all active:scale-[0.98] uppercase tracking-[0.2em]"
           >
-            Опублікувати роботу
+            Завантажити
           </button>
         </form>
       </div>

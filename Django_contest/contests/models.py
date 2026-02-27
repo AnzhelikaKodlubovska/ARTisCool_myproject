@@ -49,14 +49,25 @@ class Score(models.Model):
 # Модель Конкурсної роботи
 class Entry(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='entries')
-    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='entries')
+    # Зробимо contest необов'язковим (null=True), якщо ти ще не реалізувала вибір конкурсу
+    contest = models.ForeignKey(Contest, on_delete=models.CASCADE, related_name='entries', null=True, blank=True)
+    
     image = models.ImageField(upload_to='entries/')
+    title = models.CharField(max_length=255, default="Без назви") # Додай назву роботи
+    
+    # Поля з твоєї красивої форми
+    first_name = models.CharField(max_length=100, blank=True)
+    last_name = models.CharField(max_length=100, blank=True)
+    email = models.EmailField(blank=True)
+    age = models.IntegerField(null=True, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    
     is_premium = models.BooleanField(default=False)
     total_score = models.FloatField(default=0.0)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"{self.user.username} - {self.contest.title}"
+        return f"{self.title} ({self.user.username})"
 
 # Модель Зворотного зв'язку (Контакти)
 class ContactRequest(models.Model):
@@ -69,3 +80,4 @@ class ContactRequest(models.Model):
 
     def __str__(self):
         return f"Message from {self.name}"
+    

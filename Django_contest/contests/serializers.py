@@ -27,6 +27,7 @@ class ContestSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class EntrySerializer(serializers.ModelSerializer):
+    # Залишаємо твої вкладені серіалізатори
     user = UserSerializer(read_only=True)
     scores = ScoreSerializer(many=True, read_only=True) 
 
@@ -34,9 +35,18 @@ class EntrySerializer(serializers.ModelSerializer):
         model = Entry
         fields = [
             'id', 'user', 'contest', 'image', 
-            'is_premium', 'total_score', 'scores', 'created_at'
+            'title',        
+            'first_name',   
+            'last_name',    
+            'email',        
+            'age',          
+            'city',         
+            'is_premium', 
+            'total_score', 
+            'scores', 
+            'created_at'
         ]
-
+        
 class ContactRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = ContactRequest

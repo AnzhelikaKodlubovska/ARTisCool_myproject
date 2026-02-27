@@ -43,6 +43,12 @@ export default function Navbar() {
             >
               Про нас
             </Link>
+            <Link
+              to="/contacts"
+              className="text-slate-400 hover:text-white font-medium transition-colors text-xs uppercase tracking-widest"
+            >
+              Контакти
+            </Link>
 
             {/* Блок авторизації */}
             <div className="flex items-center gap-4 ml-4 border-l border-white/10 pl-8">
