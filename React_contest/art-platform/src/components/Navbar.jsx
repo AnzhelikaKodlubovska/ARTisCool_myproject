@@ -4,6 +4,7 @@ import { Palette, LogOut, User } from "lucide-react"; // Спростив імп
 export default function Navbar() {
   const navigate = useNavigate();
 
+  const userRole = localStorage.getItem("userRole");
   // Перевірка наявності даних
   const token = localStorage.getItem("token");
   const username = localStorage.getItem("username");
@@ -49,6 +50,14 @@ export default function Navbar() {
             >
               Контакти
             </Link>
+            {userRole === "jury" && (
+              <Link
+                to="/jury"
+                className="text-cyan-400 hover:text-cyan-300 font-black text-xs uppercase tracking-[0.2em] border border-cyan-500/30 px-4 py-2 rounded-xl bg-cyan-500/5 transition-all"
+              >
+                Панель Журі
+              </Link>
+            )}
 
             {/* Блок авторизації */}
             <div className="flex items-center gap-4 ml-4 border-l border-white/10 pl-8">

@@ -8,7 +8,13 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        return User.objects.create_user(**validated_data)
+        # Витягуємо роль окремо, щоб вона не заважала базовому створенню, 
+        # якщо create_user її не очікує
+        role = validated_data.pop('role', 'user') 
+        user = User.objects.create_user(**validated_data)
+        user.role = role
+        user.save()
+        return user
 
 class ScoreSerializer(serializers.ModelSerializer):
     jury_name = serializers.ReadOnlyField(source='jury.username')
