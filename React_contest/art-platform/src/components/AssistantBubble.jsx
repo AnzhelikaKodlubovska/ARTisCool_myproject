@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 
 export default function AssistantBubble() {
+  const location = useLocation();
   const [frame, setFrame] = useState(1);
   const [isVisible, setIsVisible] = useState(false); // Стан для появи/зникнення
 
@@ -29,6 +31,10 @@ export default function AssistantBubble() {
 
     toggleVisibility();
   }, [isVisible]);
+
+  if (location.pathname !== "/") {
+    return null;
+  }
 
   const goToShop = () => {
     window.open("https://rosa.ua/", "_blank");

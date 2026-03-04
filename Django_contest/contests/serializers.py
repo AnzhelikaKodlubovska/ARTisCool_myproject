@@ -26,6 +26,7 @@ class ScoreSerializer(serializers.ModelSerializer):
             'composition', 'technique', 'creativity', 
             'topic_match', 'comment', 'created_at'
         ]
+        read_only_fields = ['jury']
 
 class ContestSerializer(serializers.ModelSerializer):
     class Meta:

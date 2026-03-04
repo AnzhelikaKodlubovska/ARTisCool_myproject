@@ -62,4 +62,7 @@ class EntryViewSet(viewsets.ModelViewSet):
 class ScoreViewSet(viewsets.ModelViewSet):
     queryset = Score.objects.all()
     serializer_class = ScoreSerializer
+    
+    def perform_create(self, serializer):
+        serializer.save(jury=self.request.user)
 
