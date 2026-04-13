@@ -47,3 +47,6 @@ cd Contest_project/React_contest/art-platform
 npm install
 npm run dev
 ```
+### 3. Голвне вікно сайту
+<img width="1878" height="892" alt="Знімок екрана 2026-04-13 172236" src="https://github.com/user-attachments/assets/57c36034-b22e-4299-bebf-c327ffacaa60" />
+
